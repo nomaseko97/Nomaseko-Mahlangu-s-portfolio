@@ -16,21 +16,12 @@ export const Route = createFileRoute("/projects")({
 const projects = [
   {
     title: "Lumen AI — Content Studio",
-    tag: "Featured · Generative AI",
-    description: "An AI tool that generates blog posts, marketing emails, code snippets and social copy from a single prompt. Multi-tone, multi-language, with export & history.",
+    tag: "Featured · Live · Generative AI",
+    description: "A fully functional AI tool that generates blog posts, marketing emails, code snippets and social copy from a single prompt. Multi-tone, multi-language, with a built-in prompt library you can fire straight into the generator.",
     icon: Wand2,
-    features: ["Blog & article generator", "Email composer with tone control", "Code generator (Python, JS, SQL)", "Built-in prompt library"],
-    cta: { label: "Explore Prompt Library", to: "/prompts" as const },
+    features: ["Blog & article generator", "Email composer with tone control", "Code generator (Python, JS, SQL)", "Built-in searchable prompt library"],
+    cta: { label: "Try it live", to: "/studio" as const },
     accent: "from-[oklch(0.72_0.22_295)] to-[oklch(0.78_0.18_200)]",
-  },
-  {
-    title: "Prompt Library",
-    tag: "Companion product",
-    description: "A curated, searchable library of high-leverage prompts for writers, devs and marketers — packaged with the Lumen AI Studio.",
-    icon: Sparkles,
-    features: ["Categorised templates", "One-click copy", "Variable placeholders"],
-    cta: { label: "Open library", to: "/prompts" as const },
-    accent: "from-[oklch(0.78_0.2_350)] to-[oklch(0.72_0.22_295)]",
   },
   {
     title: "Standard Bank — Data Reservoir Pipelines",
