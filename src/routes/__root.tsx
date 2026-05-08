@@ -13,7 +13,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Nomaseko Mahlangu — IT Graduate, Data & Cloud" },
       { name: "description", content: "Portfolio of Nomaseko Brilliant Mahlangu — IT graduate specialising in data engineering, cloud, and AI-powered tools." },
       { property: "og:title", content: "Nomaseko Mahlangu — Portfolio" },
-      { property: "og:description", content: "Data engineer & AI builder. Explore projects, the prompt library, and get in touch." },
+      { property: "og:description", content: "Data engineer & AI builder. Explore projects, try the live AI Studio, and get in touch." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

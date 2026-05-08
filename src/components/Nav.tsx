@@ -5,7 +5,7 @@ import { Sparkles } from "lucide-react";
 const links = [
   { to: "/", label: "Home" },
   { to: "/projects", label: "Projects" },
-  { to: "/prompts", label: "Prompt Library" },
+  { to: "/studio", label: "AI Studio" },
   { to: "/contact", label: "Contact" },
 ];
 

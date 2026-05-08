@@ -16,7 +16,7 @@ export function Footer() {
         </div>
         <div className="text-sm space-y-2">
           <Link to="/projects" className="block text-muted-foreground hover:text-foreground">Projects</Link>
-          <Link to="/prompts" className="block text-muted-foreground hover:text-foreground">Prompt Library</Link>
+          <Link to="/studio" className="block text-muted-foreground hover:text-foreground">Lumen AI Studio</Link>
           <Link to="/contact" className="block text-muted-foreground hover:text-foreground">Get in touch</Link>
         </div>
       </div>
