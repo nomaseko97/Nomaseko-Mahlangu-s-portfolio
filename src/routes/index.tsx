@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, Cloud, Database, Cpu, Sparkles, Code2, Brain } from "lucide-react";
+import { ArrowRight, Database, Cpu, Sparkles, Code2, Brain } from "lucide-react";
 import portrait from "@/assets/portrait.jpg";
 import { Reveal } from "@/components/Reveal";
 
@@ -15,7 +15,6 @@ export const Route = createFileRoute("/")({
 });
 
 const skills = [
-  { icon: Cloud, label: "Azure & AWS", desc: "Data Factory, Synapse, Data Lake" },
   { icon: Database, label: "Data Engineering", desc: "SQL, SSIS, Attunity, Power BI" },
   { icon: Code2, label: "Software Dev", desc: "Python, Java, JS, C#, PHP" },
   { icon: Brain, label: "AI Tooling", desc: "LLM apps, prompt design, automation" },
