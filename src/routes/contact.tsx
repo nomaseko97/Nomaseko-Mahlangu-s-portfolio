@@ -20,7 +20,7 @@ const channels = [
   { icon: MessageCircle, label: "WhatsApp", value: "Chat instantly", href: "https://wa.me/27726667449?text=Hi%20Nomaseko%2C%20I%20saw%20your%20portfolio" },
   { icon: Linkedin, label: "LinkedIn", value: "Connect with me", href: "https://www.linkedin.com/in/nomaseko-mahlangu-0b4171178/" },
   { icon: Calendar, label: "Schedule a call", value: "Book a 20 min slot", href: "mailto:nomasekomahlangu@gmail.com?subject=Schedule%20a%20call" },
-  { icon: Github, label: "GitHub", value: "View code", href: "https://github.com/" },
+  { icon: Github, label: "GitHub", value: "@nomaseko97", href: "https://github.com/nomaseko97" },
 ];
 
 function Contact() {
