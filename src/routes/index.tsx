@@ -31,7 +31,7 @@ const experience = [
   { role: "Lab Tutor", company: "Tshwane University of Technology", period: "Aug 2018 — Dec 2018", points: ["Facilitated open lab & assisted students"] },
 ];
 
-const certs = ["DP-203 Azure Data Engineer", "AZ-900 Azure Fundamentals", "PL-900 Power Platform Fundamentals"];
+const certs = ["AZ-900 Azure Fundamentals", "PL-900 Power Platform Fundamentals"];
 
 function Home() {
   return (
@@ -75,7 +75,7 @@ function Home() {
               </Link>
             </motion.div>
             <div className="mt-10 flex gap-8 text-sm">
-              {[["5+", "years studying & working in IT"], ["3", "Microsoft certifications"], ["10+", "projects shipped"]].map(([n, l]) => (
+              {[["5+", "years studying & working in IT"], ["2", "Microsoft certifications"], ["10+", "projects shipped"]].map(([n, l]) => (
                 <div key={l}>
                   <div className="text-3xl font-display font-bold text-gradient">{n}</div>
                   <div className="text-muted-foreground text-xs mt-1 max-w-[10rem]">{l}</div>

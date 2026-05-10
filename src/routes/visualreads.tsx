@@ -6,67 +6,75 @@ import ReactMarkdown from "react-markdown";
 import { Reveal } from "@/components/Reveal";
 import { generateContent } from "@/lib/ai.functions";
 import {
-  Search, Copy, Check, Sparkles, Wand2, FileText, Mail, Code2,
-  Megaphone, Loader2, BookOpen, MessageSquarePlus, ArrowRight,
+  Search, Copy, Check, Sparkles, Wand2, BookOpen, ArrowRight, Loader2,
+  Newspaper, BookText, GraduationCap, Film, LayoutGrid, MessageSquarePlus,
 } from "lucide-react";
 
-export const Route = createFileRoute("/studio")({
+export const Route = createFileRoute("/visualreads")({
   head: () => ({
     meta: [
-      { title: "Lumen AI Studio — Nomaseko Mahlangu" },
-      { name: "description", content: "A live AI content studio that generates blogs, emails, code and social posts — with a built-in prompt library." },
+      { title: "VisualReads AI — Nomaseko Mahlangu" },
+      { name: "description", content: "VisualReads AI transforms written content — articles, novels, blogs, research — into comics, infographics, storyboards and cinematic scenes." },
     ],
   }),
-  component: Studio,
+  component: VisualReads,
 });
 
 type Kind = "blog" | "email" | "code" | "social" | "custom";
 
-const KINDS: { key: Kind; label: string; icon: any; placeholder: string }[] = [
-  { key: "blog", label: "Blog", icon: FileText, placeholder: "Write a 600-word blog post about the impact of AI on data engineering, target audience: graduates entering tech." },
-  { key: "email", label: "Email", icon: Mail, placeholder: "Write a cold outreach email to a hiring manager at a fintech company introducing me as a junior data engineer." },
-  { key: "code", label: "Code", icon: Code2, placeholder: "Write a Python function that ingests a CSV from Azure Blob Storage and loads it into Synapse, with retries and logging." },
-  { key: "social", label: "Social", icon: Megaphone, placeholder: "Write 3 LinkedIn posts announcing my new Azure DP-203 certification." },
-  { key: "custom", label: "Custom", icon: MessageSquarePlus, placeholder: "Anything you want me to write, summarise, or brainstorm…" },
+type Format = {
+  key: Kind;
+  label: string;
+  icon: any;
+  blurb: string;
+  placeholder: string;
+};
+
+const FORMATS: Format[] = [
+  { key: "blog", label: "Comic Strip", icon: LayoutGrid, blurb: "Turn an article into a 6–8 panel comic with dialogue.", placeholder: "Transform this news article into a 6-panel comic strip with vivid scene descriptions, character dialogue and panel directions:\n\n[paste article here]" },
+  { key: "blog", label: "Storyboard", icon: Film, blurb: "Cinematic scene-by-scene storyboard.", placeholder: "Convert this short story into a cinematic storyboard with shot type, camera movement, lighting and on-screen action for each scene:\n\n[paste story here]" },
+  { key: "blog", label: "Infographic", icon: Newspaper, blurb: "Data-rich infographic outline with sections & visuals.", placeholder: "Turn this research summary into an infographic outline with title, 5 key stats, suggested icons/illustrations, and a call-to-action:\n\n[paste research here]" },
+  { key: "blog", label: "Illustrated Story", icon: BookText, blurb: "Re-tell a chapter as illustrated micro-scenes.", placeholder: "Re-tell this novel chapter as 8 illustrated micro-scenes. For each scene, give a 2-sentence narration and a detailed illustration prompt:\n\n[paste chapter here]" },
+  { key: "blog", label: "Edu Visual", icon: GraduationCap, blurb: "Educational concept broken into visual explainers.", placeholder: "Transform this educational text into a visual explainer with: hook visual, 4 concept cards (each with metaphor + diagram description), and a recap visual:\n\n[paste educational content here]" },
+  { key: "custom", label: "Custom", icon: MessageSquarePlus, blurb: "Anything you want me to visualise.", placeholder: "Describe the content and the visual format you want…" },
 ];
 
 type Prompt = { title: string; category: string; body: string };
 
 const PROMPTS: Prompt[] = [
-  { category: "Blog", title: "SEO Blog Outline", body: 'Act as an SEO content strategist. Create a detailed outline for a blog post titled "{topic}" targeting the keyword "{keyword}". Include H1, 6 H2s, suggested meta description, and 5 FAQ questions.' },
-  { category: "Blog", title: "Long-form Article", body: "Write a 1200-word article on {topic} for a {audience} audience. Use a confident, friendly tone. Include intro hook, 4 sections with examples, and a conclusion with CTA." },
-  { category: "Email", title: "Cold Outreach", body: "Write a concise cold email to {recipient_role} at {company}. Goal: {goal}. Keep under 120 words, personalised opener, single clear CTA." },
-  { category: "Email", title: "Follow-up", body: "Write a polite follow-up email after {days} days of no response. Reference our previous {context}. Offer a new angle and a low-friction CTA." },
-  { category: "Code", title: "Refactor for Readability", body: "You are a senior {language} engineer. Refactor the following code for readability, name clarity, and idiomatic style. Explain key changes after.\n\n```\n{code}\n```" },
-  { category: "Code", title: "Generate Unit Tests", body: "Write thorough unit tests for the following {language} function using {framework}. Cover edge cases and failure paths.\n\n```\n{code}\n```" },
-  { category: "Code", title: "SQL Query Builder", body: "Given the schema below, write an optimised SQL query that {goal}. Explain the query plan implications.\n\nSchema:\n{schema}" },
-  { category: "Marketing", title: "Landing Page Hero", body: "Write a punchy hero headline + 1 sentence subheadline + 1 primary CTA for a product that {value_prop}. Audience: {audience}. Tone: bold and modern." },
-  { category: "Marketing", title: "Social Post Pack", body: "Create 5 social posts (LinkedIn, X, Instagram caption, Threads, Facebook) announcing {announcement}. Adapt voice per platform. Add 3 hashtags each where relevant." },
-  { category: "Productivity", title: "Meeting Summary", body: "Summarise the following meeting transcript into: 1) decisions, 2) action items with owners, 3) open questions, 4) next steps.\n\n{transcript}" },
-  { category: "Productivity", title: "Daily Planner", body: "Given the following tasks and deadlines, plan my day from {start} to {end} with focus blocks and breaks. Prioritise high-impact work.\n\n{tasks}" },
-  { category: "Career", title: "CV Bullet Rewrite", body: "Rewrite the following CV bullet to be impact-driven, quantified, and ATS-friendly:\n\n{bullet}" },
+  { category: "Comics", title: "News Article → Comic", body: "Transform the following news article into an 8-panel comic strip. For each panel, describe: setting, characters, action, dialogue/caption, and visual mood. Keep tone faithful to the original.\n\nArticle:\n{article}" },
+  { category: "Comics", title: "Short Story → Manga", body: "Adapt this short story into a 12-panel manga page. Specify panel layout, character expressions, sound effects (SFX), and dialogue bubbles.\n\nStory:\n{story}" },
+  { category: "Storyboards", title: "Novel Chapter → Cinematic Storyboard", body: "Turn this novel chapter into a cinematic storyboard with 10 shots. For each: shot type, camera movement, lens, lighting, key action, and a one-line visual prompt.\n\nChapter:\n{chapter}" },
+  { category: "Storyboards", title: "Blog → Explainer Video Storyboard", body: "Convert this blog post into a 90-second explainer video storyboard. Provide: hook (0-5s), 3 main beats with on-screen text and B-roll ideas, and an outro CTA.\n\nBlog:\n{blog}" },
+  { category: "Infographics", title: "Research Summary → Infographic", body: "Turn this research summary into an infographic spec: bold title, subtitle, 5 stat cards (number + label + icon), a comparison chart suggestion, source line and CTA.\n\nResearch:\n{research}" },
+  { category: "Infographics", title: "Magazine Feature → Visual Spread", body: "Design a 2-page magazine visual spread for this feature: hero illustration concept, 3 sidebar facts, pull-quote, and a tiny timeline visual.\n\nFeature:\n{feature}" },
+  { category: "Education", title: "Textbook Section → Visual Explainer", body: "Break this textbook section into a visual explainer: hook image, 4 concept cards (metaphor + diagram), worked example sketch, and a recap mind-map.\n\nText:\n{text}" },
+  { category: "Education", title: "Concept → Analogy Comic", body: "Explain {concept} for a {audience} learner using a 6-panel analogy comic. Each panel: visual + caption.\n\n" },
+  { category: "Interactive", title: "Article → Branching Story", body: "Re-imagine this article as an interactive branching story with 3 decision points. For each branch, describe the visual scene and the consequence.\n\nArticle:\n{article}" },
+  { category: "Interactive", title: "Blog → Scrollytelling", body: "Convert this blog into a scrollytelling experience: 6 scroll-trigger sections with background visual, headline, and 1-sentence body. Note where charts or animations should appear.\n\nBlog:\n{blog}" },
+  { category: "Cinematic", title: "Poem → Cinematic Scene", body: "Translate this poem into a single cinematic scene: location, weather, lighting, character action, sound design, and a closing visual metaphor.\n\nPoem:\n{poem}" },
+  { category: "Cinematic", title: "Historical Event → Reenactment Shotlist", body: "Produce a 12-shot cinematic reenactment shotlist for this historical event. Include period-accurate setting, costuming notes, and a lens/lighting plan.\n\nEvent:\n{event}" },
 ];
 
 const CATEGORIES = ["All", ...Array.from(new Set(PROMPTS.map((p) => p.category)))];
 
-function Studio() {
+function VisualReads() {
   const generate = useServerFn(generateContent);
 
   const [tab, setTab] = useState<"generate" | "library">("generate");
-  const [kind, setKind] = useState<Kind>("blog");
+  const [formatIdx, setFormatIdx] = useState(0);
   const [prompt, setPrompt] = useState("");
-  const [tone, setTone] = useState("Confident & friendly");
+  const [tone, setTone] = useState("Vivid, cinematic, accessible");
   const [language, setLanguage] = useState("English");
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  // library state
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
 
-  const active = KINDS.find((k) => k.key === kind)!;
+  const active = FORMATS[formatIdx];
 
   const filtered = useMemo(
     () =>
@@ -84,7 +92,8 @@ function Studio() {
     setError(null);
     setOutput("");
     try {
-      const result = await generate({ data: { kind, prompt, tone, language } });
+      const styled = `Transform the following written content into a "${active.label}" format. ${active.blurb}\n\nUser content / instructions:\n${prompt}`;
+      const result = await generate({ data: { kind: active.key, prompt: styled, tone, language } });
       if (result.ok) setOutput(result.content);
       else setError(result.error);
     } catch (e: any) {
@@ -101,8 +110,6 @@ function Studio() {
   };
 
   const useInGenerator = (p: Prompt) => {
-    const map: Record<string, Kind> = { Blog: "blog", Email: "email", Code: "code", Marketing: "social" };
-    setKind(map[p.category] ?? "custom");
     setPrompt(p.body);
     setTab("generate");
   };
@@ -112,18 +119,17 @@ function Studio() {
       <Reveal>
         <div className="text-xs font-mono text-accent uppercase tracking-widest">Featured Project · Live</div>
         <h1 className="mt-3 text-5xl md:text-6xl font-display font-bold tracking-tight">
-          Lumen <span className="text-gradient">AI Studio</span>.
+          VisualReads <span className="text-gradient">AI</span>.
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          A fully functional AI content generator — blogs, emails, code, social posts and more. Includes a built-in prompt library you can fire straight into the generator.
+          Transform articles, stories, novels, educational content, magazines, blogs and research into visually engaging experiences — comics, illustrations, infographics, storyboards, cinematic scenes and interactive storytelling.
         </p>
       </Reveal>
 
-      {/* Tabs */}
       <Reveal delay={0.05}>
         <div className="mt-10 inline-flex glass rounded-full p-1 shadow-card">
           {[
-            { k: "generate", label: "AI Generator", Icon: Wand2 },
+            { k: "generate", label: "Visualise content", Icon: Wand2 },
             { k: "library", label: "Prompt Library", Icon: BookOpen },
           ].map(({ k, label, Icon }) => (
             <button
@@ -142,36 +148,36 @@ function Studio() {
 
       {tab === "generate" ? (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_1.3fr]">
-          {/* Composer */}
           <Reveal>
             <div className="glass rounded-3xl p-6 shadow-card">
-              <div className="flex flex-wrap gap-2">
-                {KINDS.map((k) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {FORMATS.map((f, i) => (
                   <button
-                    key={k.key}
-                    onClick={() => setKind(k.key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition ${
-                      kind === k.key ? "bg-aurora text-primary-foreground shadow-glow" : "bg-secondary/50 text-muted-foreground hover:text-foreground"
+                    key={f.label}
+                    onClick={() => setFormatIdx(i)}
+                    className={`flex flex-col items-start gap-1 px-3 py-3 rounded-2xl text-left text-sm transition ${
+                      formatIdx === i ? "bg-aurora text-primary-foreground shadow-glow" : "bg-secondary/50 text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <k.icon className="h-4 w-4" />
-                    {k.label}
+                    <f.icon className="h-4 w-4" />
+                    <span className="font-semibold">{f.label}</span>
                   </button>
                 ))}
               </div>
+              <p className="mt-3 text-xs text-muted-foreground">{active.blurb}</p>
 
-              <label className="block mt-5 text-xs font-mono text-muted-foreground">Your prompt</label>
+              <label className="block mt-5 text-xs font-mono text-muted-foreground">Your content or instructions</label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={active.placeholder}
-                rows={8}
+                rows={9}
                 className="mt-2 w-full bg-secondary/40 rounded-2xl p-4 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
               />
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-muted-foreground">Tone</label>
+                  <label className="block text-xs font-mono text-muted-foreground">Tone / Style</label>
                   <input value={tone} onChange={(e) => setTone(e.target.value)} className="mt-1 w-full bg-secondary/40 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
                 </div>
                 <div>
@@ -185,7 +191,7 @@ function Studio() {
                 disabled={loading || !prompt.trim()}
                 className="mt-6 w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-aurora text-primary-foreground font-semibold shadow-glow hover:scale-[1.02] transition-transform disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {loading ? (<><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>) : (<><Sparkles className="h-4 w-4" /> Generate</>)}
+                {loading ? (<><Loader2 className="h-4 w-4 animate-spin" /> Visualising…</>) : (<><Sparkles className="h-4 w-4" /> Visualise</>)}
               </button>
 
               <button
@@ -197,7 +203,6 @@ function Studio() {
             </div>
           </Reveal>
 
-          {/* Output */}
           <Reveal delay={0.1}>
             <div className="glass rounded-3xl p-6 shadow-card min-h-[28rem] relative overflow-hidden">
               <div className="flex items-center justify-between">
@@ -218,13 +223,13 @@ function Studio() {
                 {!error && !output && !loading && (
                   <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-12 text-center text-muted-foreground">
                     <Sparkles className="h-8 w-8 mx-auto text-accent" />
-                    <p className="mt-3 text-sm">Pick a content type, drop a prompt, and watch Lumen generate.</p>
+                    <p className="mt-3 text-sm">Pick a visual format, paste your content, and watch VisualReads transform it.</p>
                   </motion.div>
                 )}
                 {loading && (
                   <motion.div key="load" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-12 text-center text-muted-foreground">
                     <Loader2 className="h-8 w-8 mx-auto text-accent animate-spin" />
-                    <p className="mt-3 text-sm">Lumen is thinking…</p>
+                    <p className="mt-3 text-sm">Storyboarding your scene…</p>
                   </motion.div>
                 )}
                 {output && !loading && (
@@ -288,11 +293,9 @@ function Studio() {
                         {p.title}
                       </h3>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => copy(p.body, p.title)} className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary text-xs font-medium transition">
-                        {copied === p.title ? <><Check className="h-3.5 w-3.5 text-accent" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy</>}
-                      </button>
-                    </div>
+                    <button onClick={() => copy(p.body, p.title)} className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary text-xs font-medium transition">
+                      {copied === p.title ? <><Check className="h-3.5 w-3.5 text-accent" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy</>}
+                    </button>
                   </div>
                   <pre className="mt-4 whitespace-pre-wrap text-sm font-mono text-muted-foreground bg-background/40 rounded-xl p-4 leading-relaxed">{p.body}</pre>
                   <button

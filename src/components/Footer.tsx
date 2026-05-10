@@ -16,7 +16,8 @@ export function Footer() {
         </div>
         <div className="text-sm space-y-2">
           <Link to="/projects" className="block text-muted-foreground hover:text-foreground">Projects</Link>
-          <Link to="/studio" className="block text-muted-foreground hover:text-foreground">Lumen AI Studio</Link>
+          <Link to="/visualreads" className="block text-muted-foreground hover:text-foreground">VisualReads AI</Link>
+          <a href="https://github.com/nomaseko97" target="_blank" rel="noreferrer" className="block text-muted-foreground hover:text-foreground">GitHub</a>
           <Link to="/contact" className="block text-muted-foreground hover:text-foreground">Get in touch</Link>
         </div>
       </div>
