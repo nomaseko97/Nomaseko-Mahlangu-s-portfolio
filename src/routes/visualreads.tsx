@@ -2,72 +2,66 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "framer-motion";
-import ReactMarkdown from "react-markdown";
 import { Reveal } from "@/components/Reveal";
-import { generateContent } from "@/lib/ai.functions";
+import { generateVisuals } from "@/lib/ai.functions";
 import {
   Search, Copy, Check, Sparkles, Wand2, BookOpen, ArrowRight, Loader2,
-  Newspaper, BookText, GraduationCap, Film, LayoutGrid, MessageSquarePlus,
+  Newspaper, BookText, GraduationCap, Film, LayoutGrid, MessageSquarePlus, Download,
 } from "lucide-react";
 
 export const Route = createFileRoute("/visualreads")({
   head: () => ({
     meta: [
       { title: "VisualReads AI — Nomaseko Mahlangu" },
-      { name: "description", content: "VisualReads AI transforms written content — articles, novels, blogs, research — into comics, infographics, storyboards and cinematic scenes." },
+      { name: "description", content: "VisualReads AI turns articles, novels, blogs and research into actual comics, infographics, storyboards and cinematic scenes." },
     ],
   }),
   component: VisualReads,
 });
 
-type Kind = "blog" | "email" | "code" | "social" | "custom";
+type Format = "comic" | "storyboard" | "infographic" | "illustration" | "cinematic" | "interactive";
 
-type Format = {
-  key: Kind;
-  label: string;
-  icon: any;
-  blurb: string;
-  placeholder: string;
-};
-
-const FORMATS: Format[] = [
-  { key: "blog", label: "Comic Strip", icon: LayoutGrid, blurb: "Turn an article into a 6–8 panel comic with dialogue.", placeholder: "Transform this news article into a 6-panel comic strip with vivid scene descriptions, character dialogue and panel directions:\n\n[paste article here]" },
-  { key: "blog", label: "Storyboard", icon: Film, blurb: "Cinematic scene-by-scene storyboard.", placeholder: "Convert this short story into a cinematic storyboard with shot type, camera movement, lighting and on-screen action for each scene:\n\n[paste story here]" },
-  { key: "blog", label: "Infographic", icon: Newspaper, blurb: "Data-rich infographic outline with sections & visuals.", placeholder: "Turn this research summary into an infographic outline with title, 5 key stats, suggested icons/illustrations, and a call-to-action:\n\n[paste research here]" },
-  { key: "blog", label: "Illustrated Story", icon: BookText, blurb: "Re-tell a chapter as illustrated micro-scenes.", placeholder: "Re-tell this novel chapter as 8 illustrated micro-scenes. For each scene, give a 2-sentence narration and a detailed illustration prompt:\n\n[paste chapter here]" },
-  { key: "blog", label: "Edu Visual", icon: GraduationCap, blurb: "Educational concept broken into visual explainers.", placeholder: "Transform this educational text into a visual explainer with: hook visual, 4 concept cards (each with metaphor + diagram description), and a recap visual:\n\n[paste educational content here]" },
-  { key: "custom", label: "Custom", icon: MessageSquarePlus, blurb: "Anything you want me to visualise.", placeholder: "Describe the content and the visual format you want…" },
+const FORMATS: { key: Format; label: string; icon: any; blurb: string; placeholder: string }[] = [
+  { key: "comic", label: "Comic Strip", icon: LayoutGrid, blurb: "Bold panels with characters, action and mood.", placeholder: "Paste a news article, story or blog and I'll turn it into comic panels." },
+  { key: "storyboard", label: "Storyboard", icon: Film, blurb: "Cinematic scene-by-scene frames.", placeholder: "Drop a short story or scene description for a visual storyboard." },
+  { key: "infographic", label: "Infographic", icon: Newspaper, blurb: "Data and key points as a designed visual.", placeholder: "Paste a research summary, report or data-rich blog." },
+  { key: "illustration", label: "Illustrated Story", icon: BookText, blurb: "Editorial illustrations of micro-scenes.", placeholder: "Paste a chapter or short story to illustrate." },
+  { key: "cinematic", label: "Cinematic Scene", icon: Film, blurb: "Photo-real film stills.", placeholder: "Describe a moment, poem or passage to render cinematically." },
+  { key: "interactive", label: "Interactive Story", icon: MessageSquarePlus, blurb: "Branching key-art for choose-your-path stories.", placeholder: "Paste a story you want re-imagined as interactive scenes." },
 ];
 
-type Prompt = { title: string; category: string; body: string };
+type Prompt = { title: string; category: string; body: string; format: Format };
 
 const PROMPTS: Prompt[] = [
-  { category: "Comics", title: "News Article → Comic", body: "Transform the following news article into an 8-panel comic strip. For each panel, describe: setting, characters, action, dialogue/caption, and visual mood. Keep tone faithful to the original.\n\nArticle:\n{article}" },
-  { category: "Comics", title: "Short Story → Manga", body: "Adapt this short story into a 12-panel manga page. Specify panel layout, character expressions, sound effects (SFX), and dialogue bubbles.\n\nStory:\n{story}" },
-  { category: "Storyboards", title: "Novel Chapter → Cinematic Storyboard", body: "Turn this novel chapter into a cinematic storyboard with 10 shots. For each: shot type, camera movement, lens, lighting, key action, and a one-line visual prompt.\n\nChapter:\n{chapter}" },
-  { category: "Storyboards", title: "Blog → Explainer Video Storyboard", body: "Convert this blog post into a 90-second explainer video storyboard. Provide: hook (0-5s), 3 main beats with on-screen text and B-roll ideas, and an outro CTA.\n\nBlog:\n{blog}" },
-  { category: "Infographics", title: "Research Summary → Infographic", body: "Turn this research summary into an infographic spec: bold title, subtitle, 5 stat cards (number + label + icon), a comparison chart suggestion, source line and CTA.\n\nResearch:\n{research}" },
-  { category: "Infographics", title: "Magazine Feature → Visual Spread", body: "Design a 2-page magazine visual spread for this feature: hero illustration concept, 3 sidebar facts, pull-quote, and a tiny timeline visual.\n\nFeature:\n{feature}" },
-  { category: "Education", title: "Textbook Section → Visual Explainer", body: "Break this textbook section into a visual explainer: hook image, 4 concept cards (metaphor + diagram), worked example sketch, and a recap mind-map.\n\nText:\n{text}" },
-  { category: "Education", title: "Concept → Analogy Comic", body: "Explain {concept} for a {audience} learner using a 6-panel analogy comic. Each panel: visual + caption.\n\n" },
-  { category: "Interactive", title: "Article → Branching Story", body: "Re-imagine this article as an interactive branching story with 3 decision points. For each branch, describe the visual scene and the consequence.\n\nArticle:\n{article}" },
-  { category: "Interactive", title: "Blog → Scrollytelling", body: "Convert this blog into a scrollytelling experience: 6 scroll-trigger sections with background visual, headline, and 1-sentence body. Note where charts or animations should appear.\n\nBlog:\n{blog}" },
-  { category: "Cinematic", title: "Poem → Cinematic Scene", body: "Translate this poem into a single cinematic scene: location, weather, lighting, character action, sound design, and a closing visual metaphor.\n\nPoem:\n{poem}" },
-  { category: "Cinematic", title: "Historical Event → Reenactment Shotlist", body: "Produce a 12-shot cinematic reenactment shotlist for this historical event. Include period-accurate setting, costuming notes, and a lens/lighting plan.\n\nEvent:\n{event}" },
+  { category: "Comics", format: "comic", title: "News Article → Comic", body: "Transform this news article into a vivid comic strip — capture the key beats, characters and mood:\n\n{paste article}" },
+  { category: "Comics", format: "comic", title: "Short Story → Manga", body: "Adapt this short story into manga-style panels with expressive characters and emotional pacing:\n\n{paste story}" },
+  { category: "Storyboards", format: "storyboard", title: "Novel Chapter → Storyboard", body: "Turn this novel chapter into a cinematic storyboard — strong shot composition, lighting and mood:\n\n{paste chapter}" },
+  { category: "Storyboards", format: "storyboard", title: "Blog → Explainer Storyboard", body: "Convert this blog post into a 90-second explainer video storyboard with a hook, beats and outro:\n\n{paste blog}" },
+  { category: "Infographics", format: "infographic", title: "Research → Infographic", body: "Turn this research summary into a designed infographic with bold stats and clear hierarchy:\n\n{paste research}" },
+  { category: "Infographics", format: "infographic", title: "Magazine Feature → Spread", body: "Design a magazine-style visual spread for this feature — hero visual, sidebars, pull-quote:\n\n{paste feature}" },
+  { category: "Education", format: "illustration", title: "Textbook → Visual Explainer", body: "Break this textbook section into illustrated micro-scenes that teach the concept visually:\n\n{paste text}" },
+  { category: "Education", format: "illustration", title: "Concept → Analogy Comic", body: "Explain {concept} for a {audience} learner using an analogy comic with vivid visuals." },
+  { category: "Cinematic", format: "cinematic", title: "Poem → Cinematic Scene", body: "Translate this poem into a single cinematic film still — location, lighting, mood, metaphor:\n\n{paste poem}" },
+  { category: "Cinematic", format: "cinematic", title: "Historical Event → Reenactment", body: "Produce cinematic reenactment frames for this historical event with period-accurate styling:\n\n{paste event}" },
+  { category: "Interactive", format: "interactive", title: "Article → Branching Story", body: "Re-imagine this article as an interactive branching story with scene art for each decision:\n\n{paste article}" },
+  { category: "Interactive", format: "interactive", title: "Blog → Scrollytelling", body: "Convert this blog into scrollytelling key-art scenes that pace the narrative:\n\n{paste blog}" },
 ];
 
 const CATEGORIES = ["All", ...Array.from(new Set(PROMPTS.map((p) => p.category)))];
 
+type Panel = { caption: string; image?: string; prompt: string };
+type Result = { title: string; summary: string; panels: Panel[] };
+
 function VisualReads() {
-  const generate = useServerFn(generateContent);
+  const generate = useServerFn(generateVisuals);
 
   const [tab, setTab] = useState<"generate" | "library">("generate");
   const [formatIdx, setFormatIdx] = useState(0);
   const [prompt, setPrompt] = useState("");
-  const [tone, setTone] = useState("Vivid, cinematic, accessible");
-  const [language, setLanguage] = useState("English");
+  const [style, setStyle] = useState("Vivid, modern, cinematic");
+  const [panels, setPanels] = useState(3);
   const [loading, setLoading] = useState(false);
-  const [output, setOutput] = useState("");
+  const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -90,12 +84,11 @@ function VisualReads() {
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
-    setOutput("");
+    setResult(null);
     try {
-      const styled = `Transform the following written content into a "${active.label}" format. ${active.blurb}\n\nUser content / instructions:\n${prompt}`;
-      const result = await generate({ data: { kind: active.key, prompt: styled, tone, language } });
-      if (result.ok) setOutput(result.content);
-      else setError(result.error);
+      const res = await generate({ data: { format: active.key, prompt, panels, style } });
+      if (res.ok) setResult({ title: res.title, summary: res.summary, panels: res.panels });
+      else setError(res.error);
     } catch (e: any) {
       setError(e?.message ?? "Failed to generate.");
     } finally {
@@ -111,6 +104,8 @@ function VisualReads() {
 
   const useInGenerator = (p: Prompt) => {
     setPrompt(p.body);
+    const idx = FORMATS.findIndex((f) => f.key === p.format);
+    if (idx >= 0) setFormatIdx(idx);
     setTab("generate");
   };
 
@@ -122,7 +117,7 @@ function VisualReads() {
           VisualReads <span className="text-gradient">AI</span>.
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          Transform articles, stories, novels, educational content, magazines, blogs and research into visually engaging experiences — comics, illustrations, infographics, storyboards, cinematic scenes and interactive storytelling.
+          Paste any written content — an article, novel chapter, research summary, blog or email — and watch it become an actual visual experience: comic panels, storyboards, infographics and cinematic scenes.
         </p>
       </Reveal>
 
@@ -177,12 +172,12 @@ function VisualReads() {
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-muted-foreground">Tone / Style</label>
-                  <input value={tone} onChange={(e) => setTone(e.target.value)} className="mt-1 w-full bg-secondary/40 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
+                  <label className="block text-xs font-mono text-muted-foreground">Visual style</label>
+                  <input value={style} onChange={(e) => setStyle(e.target.value)} className="mt-1 w-full bg-secondary/40 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono text-muted-foreground">Language</label>
-                  <input value={language} onChange={(e) => setLanguage(e.target.value)} className="mt-1 w-full bg-secondary/40 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
+                  <label className="block text-xs font-mono text-muted-foreground">Panels ({panels})</label>
+                  <input type="range" min={1} max={4} value={panels} onChange={(e) => setPanels(parseInt(e.target.value))} className="mt-3 w-full accent-[var(--accent)]" />
                 </div>
               </div>
 
@@ -207,9 +202,9 @@ function VisualReads() {
             <div className="glass rounded-3xl p-6 shadow-card min-h-[28rem] relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-mono text-accent uppercase tracking-widest">Output</div>
-                {output && (
-                  <button onClick={() => copy(output, "out")} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary text-xs font-medium transition">
-                    {copied === "out" ? <><Check className="h-3.5 w-3.5 text-accent" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy</>}
+                {result && (
+                  <button onClick={() => copy(result.summary, "out")} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary text-xs font-medium transition">
+                    {copied === "out" ? <><Check className="h-3.5 w-3.5 text-accent" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy summary</>}
                   </button>
                 )}
               </div>
@@ -220,26 +215,58 @@ function VisualReads() {
                     {error}
                   </motion.div>
                 )}
-                {!error && !output && !loading && (
+                {!error && !result && !loading && (
                   <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-12 text-center text-muted-foreground">
                     <Sparkles className="h-8 w-8 mx-auto text-accent" />
-                    <p className="mt-3 text-sm">Pick a visual format, paste your content, and watch VisualReads transform it.</p>
+                    <p className="mt-3 text-sm">Pick a visual format, paste content, and watch it transform into real images.</p>
                   </motion.div>
                 )}
                 {loading && (
                   <motion.div key="load" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-12 text-center text-muted-foreground">
                     <Loader2 className="h-8 w-8 mx-auto text-accent animate-spin" />
-                    <p className="mt-3 text-sm">Storyboarding your scene…</p>
+                    <p className="mt-3 text-sm">Storyboarding & rendering panels — this takes a moment…</p>
                   </motion.div>
                 )}
-                {output && !loading && (
-                  <motion.article
-                    key="out"
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 prose prose-invert prose-sm max-w-none prose-pre:bg-background/60 prose-pre:rounded-xl prose-headings:font-display"
-                  >
-                    <ReactMarkdown>{output}</ReactMarkdown>
-                  </motion.article>
+                {result && !loading && (
+                  <motion.div key="out" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 space-y-5">
+                    <div>
+                      <h3 className="text-2xl font-display font-bold">{result.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{result.summary}</p>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {result.panels.map((p, i) => (
+                        <motion.figure
+                          key={i}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.08 }}
+                          className="glass rounded-2xl overflow-hidden shadow-card group relative"
+                        >
+                          {p.image ? (
+                            <div className="relative">
+                              <img src={p.image} alt={p.caption} className="w-full aspect-square object-cover" />
+                              <a
+                                href={p.image}
+                                download={`visualreads-panel-${i + 1}.png`}
+                                className="absolute top-2 right-2 p-2 rounded-full bg-background/80 backdrop-blur opacity-0 group-hover:opacity-100 transition"
+                                title="Download"
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                              </a>
+                            </div>
+                          ) : (
+                            <div className="w-full aspect-square bg-secondary/40 flex items-center justify-center text-xs text-muted-foreground p-4 text-center">
+                              Image render failed — try regenerating.
+                            </div>
+                          )}
+                          <figcaption className="p-4">
+                            <div className="text-xs font-mono text-accent">Panel {i + 1}</div>
+                            <p className="mt-1 text-sm">{p.caption}</p>
+                          </figcaption>
+                        </motion.figure>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
