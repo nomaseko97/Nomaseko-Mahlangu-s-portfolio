@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/Reveal";
-import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles } from "lucide-react";
+import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users } from "lucide-react";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
     meta: [
       { title: "Projects — Nomaseko Mahlangu" },
-      { name: "description", content: "VisualReads AI — turning written content into comics, infographics, storyboards and cinematic scenes." },
+      { name: "description", content: "VisualReads AI and JobGenie — flagship AI products built end-to-end." },
     ],
   }),
   component: Projects,
@@ -28,12 +28,12 @@ function Projects() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <Reveal>
-        <div className="text-xs font-mono text-accent uppercase tracking-widest">Featured Project</div>
+        <div className="text-xs font-mono text-accent uppercase tracking-widest">Featured Projects</div>
         <h1 className="mt-3 text-5xl md:text-6xl font-display font-bold tracking-tight">
           Projects that <span className="text-gradient">ship value</span>.
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          A flagship generative-AI product built end-to-end — live, interactive, and ready to try.
+          Flagship generative-AI products built end-to-end — live, interactive, and ready to try.
         </p>
       </Reveal>
 
