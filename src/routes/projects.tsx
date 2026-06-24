@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/Reveal";
-import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users, Leaf, Droplets, Sun, LineChart, Bot, Satellite } from "lucide-react";
+import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users, Leaf, Droplets, Sun, LineChart, Bot, Satellite, Gamepad2, Activity, Shield, TrendingUp, Flame, BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -222,6 +222,71 @@ function Projects() {
           </div>
         </motion.article>
       </Reveal>
+
+      <Reveal delay={0.2}>
+        <motion.article
+          whileHover={{ y: -6 }}
+          className="group relative mt-10 glass rounded-3xl p-10 md:p-12 shadow-elegant overflow-hidden noise"
+        >
+          <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-gradient-to-br from-[oklch(0.78_0.2_280)] to-[oklch(0.78_0.18_320)] opacity-30 blur-3xl group-hover:opacity-60 transition-opacity" />
+          <div className="absolute -right-32 -bottom-32 h-96 w-96 rounded-full bg-aurora opacity-20 blur-3xl" />
+
+          <div className="relative grid lg:grid-cols-[1.2fr_1fr] gap-10 items-start">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 rounded-2xl bg-aurora flex items-center justify-center shadow-glow">
+                  <Gamepad2 className="h-7 w-7 text-primary-foreground" />
+                </div>
+                <span className="text-xs font-mono text-accent uppercase tracking-widest">Live · Gaming Sentiment AI</span>
+              </div>
+
+              <h2 className="mt-6 text-4xl md:text-5xl font-display font-bold tracking-tight">
+                Game<span className="text-gradient">Pulse</span>
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                An AI-powered gaming sentiment analysis platform that ingests player chat in real time and classifies each message into <strong className="text-foreground">six emotional categories</strong> — positive, excited, neutral, frustrated, negative, and toxic — surfacing the results through a live moderation dashboard.
+              </p>
+              <p className="mt-3 text-muted-foreground">
+                Built for esports ops and community teams: toxicity heatmaps, player reputation scores, behavior-aware matchmaking and AI-generated summaries across <strong className="text-foreground">Valorant, CS2, Apex, Fortnite, LoL, Dota 2 and EA FC 25</strong>.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["Real-time chat", "6-class sentiment", "Toxicity heatmap", "Reputation scores", "AI Sweep summaries", "Per-game filters"].map((s) => (
+                  <span key={s} className="text-xs px-3 py-1.5 rounded-full bg-secondary/60 text-muted-foreground">{s}</span>
+                ))}
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="https://github.com/nomaseko97/gamepulse-insights" target="_blank" rel="noreferrer" className="group/btn inline-flex items-center gap-2 px-6 py-3 rounded-full bg-aurora text-primary-foreground font-semibold shadow-glow hover:scale-105 transition-transform">
+                  View on GitHub <ArrowUpRight className="h-4 w-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { icon: Activity, label: "Live chat sentiment feed" },
+                { icon: Flame, label: "Region × hour toxicity heatmap" },
+                { icon: Shield, label: "Auto-flagged moderation alerts" },
+                { icon: TrendingUp, label: "24-hour sentiment trend" },
+                { icon: Users, label: "Player reputation leaderboard" },
+                { icon: BarChart3, label: "Emotion distribution radial" },
+              ].map((f) => (
+                <div key={f.label} className="glass rounded-2xl p-5 shadow-card flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-aurora/80 flex items-center justify-center shrink-0 shadow-glow">
+                    <f.icon className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">{f.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.article>
+      </Reveal>
+
+
 
 
       <Reveal>
