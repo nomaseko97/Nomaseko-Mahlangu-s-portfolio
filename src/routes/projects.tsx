@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/Reveal";
-import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users } from "lucide-react";
+import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users, Leaf, Droplets, Sun, LineChart, Bot, Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
