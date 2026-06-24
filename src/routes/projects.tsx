@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/Reveal";
-import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users } from "lucide-react";
+import { FileText, Mail, ArrowUpRight, Wand2, LayoutGrid, Film, Newspaper, BookText, GraduationCap, Sparkles, Briefcase, Heart, MessageCircle, Users, Leaf, Droplets, Sun, LineChart, Bot, Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -156,6 +156,73 @@ function Projects() {
           </div>
         </motion.article>
       </Reveal>
+
+      <Reveal delay={0.15}>
+        <motion.article
+          whileHover={{ y: -6 }}
+          className="group relative mt-10 glass rounded-3xl p-10 md:p-12 shadow-elegant overflow-hidden noise"
+        >
+          <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-gradient-to-br from-[oklch(0.78_0.18_150)] to-[oklch(0.78_0.16_200)] opacity-30 blur-3xl group-hover:opacity-60 transition-opacity" />
+          <div className="absolute -left-32 -bottom-32 h-96 w-96 rounded-full bg-aurora opacity-20 blur-3xl" />
+
+          <div className="relative grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 rounded-2xl bg-aurora flex items-center justify-center shadow-glow">
+                  <Leaf className="h-7 w-7 text-primary-foreground" />
+                </div>
+                <span className="text-xs font-mono text-accent uppercase tracking-widest">Live · Agriculture Intelligence</span>
+              </div>
+
+              <h2 className="mt-6 text-4xl md:text-5xl font-display font-bold tracking-tight">
+                Agri<span className="text-gradient">Vision</span>
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                A production-ready agriculture intelligence platform that helps farmers <strong className="text-foreground">detect crop diseases, monitor farm health, optimize irrigation, predict yields</strong> and get hyperlocal weather forecasts — no account, no subscription, free for every farmer.
+              </p>
+              <p className="mt-3 text-muted-foreground">
+                Built to put modern agronomy tools — usually locked behind expensive subscriptions — into the hands of every smallholder farmer. Supports <strong className="text-foreground">28+ crops</strong> out of the box plus custom crops, with a categorized prompt library for the built-in farming assistant.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["Disease detection", "Smart irrigation", "Weather intelligence", "Yield prediction", "Drone & satellite", "Guest mode"].map((s) => (
+                  <span key={s} className="text-xs px-3 py-1.5 rounded-full bg-secondary/60 text-muted-foreground">{s}</span>
+                ))}
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="https://github.com/nomaseko97/agribloom-ai" target="_blank" rel="noreferrer" className="group/btn inline-flex items-center gap-2 px-6 py-3 rounded-full bg-aurora text-primary-foreground font-semibold shadow-glow hover:scale-105 transition-transform">
+                  View on GitHub <ArrowUpRight className="h-4 w-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                </a>
+                <a href="https://id-preview--4c5056de-e663-4597-a775-e1a9c35cc757.lovable.app" target="_blank" rel="noreferrer" className="px-6 py-3 rounded-full glass font-medium hover:bg-secondary/60 transition-colors">
+                  Live preview
+                </a>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { icon: Leaf, label: "Disease detection (28+ crops)" },
+                { icon: Droplets, label: "Smart irrigation & soil moisture" },
+                { icon: Sun, label: "Hyperlocal 7-day weather" },
+                { icon: LineChart, label: "Yield & revenue forecasting" },
+                { icon: Bot, label: "Farming assistant + prompt library" },
+                { icon: Satellite, label: "Drone & satellite heatmaps" },
+              ].map((f) => (
+                <div key={f.label} className="glass rounded-2xl p-5 shadow-card flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-aurora/80 flex items-center justify-center shrink-0 shadow-glow">
+                    <f.icon className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">{f.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.article>
+      </Reveal>
+
 
       <Reveal>
         <div className="mt-20 glass rounded-3xl p-10 shadow-elegant text-center">
